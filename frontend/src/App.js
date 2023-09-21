@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function App() {
-  const [jsonData, setJsonData] = useState(null);
+  const [jsonData, setJsonData] = useState({});
 
   useEffect(() => {
     axios.get('http://localhost:8999/index')
@@ -12,11 +12,11 @@ function App() {
         setJsonData(response.data);
       })
       .catch((error) => {
-        console.error('Error fetching data: ', error)
+        console.error('Error fetching data: ', error);
       })
   }, []);
 
-  console.log('jsonData: ', jsonData)
+  console.log('jsonData: ', jsonData);
 
   return (
     <div className="App">
