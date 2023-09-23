@@ -1,19 +1,26 @@
 import logo from './logo.svg';
 import './App.css';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 
 function App() {
   const [jsonData, setJsonData] = useState({});
 
   useEffect(() => {
-    axios.get('http://localhost:8999/index')
-      .then((response) => {
-        setJsonData(response.data);
-      })
-      .catch((error) => {
+    async function fetchData() {
+      try {
+        const response = await fetch('http://localhost:8999/index');
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setJsonData(data);
+      } catch (error) {
         console.error('Error fetching data: ', error);
-      })
+      }
+    }
+
+    fetchData();
   }, []);
 
   console.log('jsonData: ', jsonData);
