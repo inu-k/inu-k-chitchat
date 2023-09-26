@@ -1,6 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { useState, useEffect } from 'react';
+import Navbar from './components/NavBar.js';
 
 function App() {
   const [jsonData, setJsonData] = useState({});
@@ -27,10 +28,11 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
+      <header>
+        <Navbar />
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          Hello, World!
         </p>
         <a
           className="App-link"
@@ -44,8 +46,10 @@ function App() {
         <p>
           Your name is {jsonData.name}, Your message is "{jsonData.message}".
         </p>
-      </header>
 
+
+
+      </header>
     </div>
   );
 }

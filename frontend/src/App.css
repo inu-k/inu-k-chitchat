@@ -32,7 +32,21 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
+}
+
+.NavBar {
+  background-color: white;
+  width: 100%;
+  border-bottom: #CCCCCC 3px solid;
+}
+
+.NavBar-bland {
+  padding: 20px 15px;
+  text-align: left;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
 }
