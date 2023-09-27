@@ -24,6 +24,7 @@ type Post struct {
 }
 
 // get all threads in the database and returns it
+// GET /threads
 func Threads(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 
