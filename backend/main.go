@@ -46,6 +46,7 @@ func main() {
 	handler := c.Handler(mux)
 	mux.HandleFunc("/index", index)
 	mux.HandleFunc("/threads", data.Threads)
+	mux.HandleFunc("/posts", data.GetPosts)
 
 	server := http.Server{
 		Addr:    "127.0.0.1:8999",

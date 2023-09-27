@@ -15,12 +15,12 @@ type Thread struct {
 }
 
 type Post struct {
-	Id        int
-	Uuid      string
-	Body      string
-	UserId    int
-	ThreadId  int
-	CreatedAt time.Time
+	Id        int       `json:"id"`
+	Uuid      string    `json:"uuid"`
+	Body      string    `json:"body"`
+	UserId    int       `json:"userId"`
+	ThreadId  int       `json:"threadId"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 // get all threads in the database and returns it
@@ -47,6 +47,45 @@ func Threads(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	responseJson, err := json.Marshal(threads)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(responseJson)
+	return
+}
+
+// get posts to a thread
+// GET /posts?thread_uuid=1
+func GetPosts(w http.ResponseWriter, r *http.Request) {
+	vals := r.URL.Query()
+	threadUuid := vals.Get("thread_uuid")
+	var threadId int
+	err := Db.QueryRow("SELECT id FROM threads WHERE uuid = $1", threadUuid).Scan(&threadId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	posts := make([]Post, 0)
+	rows, err := Db.Query("SELECT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE thread_id = $1 ORDER BY created_at", threadId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	for rows.Next() {
+		post := Post{}
+		if err = rows.Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		posts = append(posts, post)
+	}
+	rows.Close()
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	responseJson, err := json.Marshal(posts)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
