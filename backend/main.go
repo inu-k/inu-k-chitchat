@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"inu-k-chitchat/data"
 	"net/http"
 
 	"github.com/rs/cors"
@@ -44,6 +45,7 @@ func main() {
 	c := cors.Default()
 	handler := c.Handler(mux)
 	mux.HandleFunc("/index", index)
+	mux.HandleFunc("/threads", data.Threads)
 
 	server := http.Server{
 		Addr:    "127.0.0.1:8999",
