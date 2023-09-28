@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import { useState, useEffect } from 'react';
 import Navbar from './components/NavBar.js';
+import ThreadsPage from './pages/threads.jsx';
 
 function App() {
   const [jsonData, setJsonData] = useState({});
@@ -47,7 +48,7 @@ function App() {
           Your name is {jsonData.name}, Your message is "{jsonData.message}".
         </p>
 
-
+        <ThreadsPage />
 
       </header>
     </div>
