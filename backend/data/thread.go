@@ -25,7 +25,7 @@ type Post struct {
 
 // get all threads in the database and returns it
 // GET /threads
-func Threads(w http.ResponseWriter, r *http.Request) {
+func GetThreads(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 
 	rows, err := Db.Query("SELECT id, uuid, topic, user_id, created_at FROM threads ORDER BY created_at DESC")
