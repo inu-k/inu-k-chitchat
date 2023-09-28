@@ -3,6 +3,7 @@ import './App.css';
 import { useState, useEffect } from 'react';
 import Navbar from './components/NavBar.js';
 import ThreadsPage from './pages/threads.jsx';
+import { Routes, Route, Link } from 'react-router-dom';
 
 function App() {
   const [jsonData, setJsonData] = useState({});
@@ -31,26 +32,27 @@ function App() {
     <div className="App">
       <header>
         <Navbar />
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Hello, World!
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-
-        <p>
-          Your name is {jsonData.name}, Your message is "{jsonData.message}".
-        </p>
-
-        <ThreadsPage />
-
       </header>
+
+      <Routes>
+        <Route path="/" element={
+          <div>
+            <img src={logo} className="App-logo" alt="logo" />
+            <p>
+              <Link to='/threads'>
+                See Threads
+              </Link>
+            </p>
+
+            <p>
+              Your name is {jsonData.name}, Your message is "{jsonData.message}".
+            </p>
+          </div>
+        } />
+        <Route path="/threads" element={<ThreadsPage />} />
+      </Routes>
+
+
     </div>
   );
 }
