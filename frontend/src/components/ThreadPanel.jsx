@@ -11,7 +11,7 @@ export default function ThreadPanel({ thread }) {
     const minutes = createdAt.getMinutes();
     const seconds = createdAt.getSeconds();
 
-    const formattedData = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+    const formattedData = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
     return (
         <div className='thread-panel'>

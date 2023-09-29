@@ -2,8 +2,9 @@ import logo from './logo.svg';
 import './App.css';
 import { useState, useEffect } from 'react';
 import Navbar from './components/NavBar.js';
-import ThreadsPage from './pages/threads.jsx';
+import ThreadsPage from './pages/Threads.jsx';
 import { Routes, Route, Link } from 'react-router-dom';
+import PostsPage from './pages/PostsPage.jsx';
 
 function App() {
   const [jsonData, setJsonData] = useState({});
@@ -25,8 +26,6 @@ function App() {
 
     fetchData();
   }, []);
-
-  console.log('jsonData: ', jsonData);
 
   return (
     <div className="App">
@@ -50,6 +49,7 @@ function App() {
           </div>
         } />
         <Route path="/threads" element={<ThreadsPage />} />
+        <Route path="/posts" element={<PostsPage />} />
       </Routes>
 
 
