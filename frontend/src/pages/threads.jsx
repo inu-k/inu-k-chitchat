@@ -22,12 +22,13 @@ export default function ThreadsPage() {
         fetchData();
     }, []);
 
+    console.log(threads);
     return (
         <div className="container">
             <h1>Threads</h1>
             {threads.map((thread) => {
                 return (
-                    <ThreadPanel thread={thread} />
+                    <ThreadPanel key={thread.id} thread={thread} />
                 )
             })}
         </div>
