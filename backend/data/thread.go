@@ -6,11 +6,12 @@ import (
 	"time"
 )
 
-type Thread struct {
+type ThreadInfo struct {
 	Id        int       `json:"id"`
 	Uuid      string    `json:"uuid"`
 	Topic     string    `json:"topic"`
 	UserId    int       `json:"userId"`
+	PostsNum  int       `json:"postsNum"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 
@@ -23,21 +24,21 @@ type Post struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
-// get all threads in the database and returns it
+// get all threads in the database with a number of posts and returns it
 // GET /threads
 func GetThreads(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 
-	rows, err := Db.Query("SELECT id, uuid, topic, user_id, created_at FROM threads ORDER BY created_at DESC")
+	rows, err := Db.Query("select A.*, COUNT(B.id) as post_num from threads as A left join posts as B on B.thread_id=A.id group by A.id, A.uuid, A.topic, A.user_id, A.created_at ORDER BY A.created_at DESC")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	threads := make([]Thread, 0)
+	threads := make([]ThreadInfo, 0)
 	for rows.Next() {
-		thread := Thread{}
-		if err = rows.Scan(&thread.Id, &thread.Uuid, &thread.Topic, &thread.UserId, &thread.CreatedAt); err != nil {
+		thread := ThreadInfo{}
+		if err = rows.Scan(&thread.Id, &thread.Uuid, &thread.Topic, &thread.UserId, &thread.CreatedAt, &thread.PostsNum); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

@@ -21,9 +21,6 @@ func index(w http.ResponseWriter, r *http.Request) {
 		Message: "TestMessage",
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
 	responseJson, err := json.Marshal(jsonData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
