@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import ThreadPanel from "../components/ThreadPanel.jsx"
 
+// threads page
 export default function ThreadsPage() {
     const [threads, setThreads] = useState([]);
 

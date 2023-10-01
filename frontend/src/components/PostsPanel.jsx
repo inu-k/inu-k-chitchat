@@ -1,3 +1,4 @@
+// show posts to a thread
 export default function PostsPanel({ posts }) {
 
     return (

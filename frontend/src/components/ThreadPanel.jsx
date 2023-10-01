@@ -1,6 +1,7 @@
 import '../App.css'
 import { Link } from 'react-router-dom'
 
+// show threads
 export default function ThreadPanel({ thread }) {
     const createdAt = new Date(thread.createdAt);
 

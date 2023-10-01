@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import PostsPanel from '../components/PostsPanel.jsx';
 
+// show posts page
+// posts to a thread with thread information
 export default function PostsPage() {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
