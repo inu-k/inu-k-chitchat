@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { useState, useEffect } from 'react';
-import Navbar from './components/NavBar.js';
+import Navbar from './components/NavBar.jsx';
 import ThreadsPage from './pages/ThreadsPage.jsx';
 import { Routes, Route, Link } from 'react-router-dom';
 import PostsPage from './pages/PostsPage.jsx';
