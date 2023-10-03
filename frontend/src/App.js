@@ -5,28 +5,9 @@ import Navbar from './components/NavBar.jsx';
 import ThreadsPage from './pages/ThreadsPage.jsx';
 import { Routes, Route, Link } from 'react-router-dom';
 import PostsPage from './pages/PostsPage.jsx';
+import { fetchData } from './functions/utils.jsx';
 
 function App() {
-  const [jsonData, setJsonData] = useState({});
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch('http://localhost:8999/index');
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setJsonData(data);
-      } catch (error) {
-        console.error('Error fetching data: ', error);
-      }
-    }
-
-    fetchData();
-  }, []);
-
   return (
     <div className="App">
       <header>
@@ -36,15 +17,13 @@ function App() {
       <Routes>
         <Route path="/" element={
           <div>
-            <img src={logo} className="App-logo" alt="logo" />
+            <p>
+              Welcome to inu-k-chitchat!
+            </p>
             <p>
               <Link to='/threads'>
                 See Threads
               </Link>
-            </p>
-
-            <p>
-              Your name is {jsonData.name}, Your message is "{jsonData.message}".
             </p>
           </div>
         } />

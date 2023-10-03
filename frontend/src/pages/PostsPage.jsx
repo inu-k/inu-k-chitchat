@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import PostsPanel from '../components/PostsPanel.jsx';
+import { fetchData } from '../functions/utils.jsx';
 
 // show posts page
 // posts to a thread with thread information
@@ -11,29 +12,24 @@ export default function PostsPage() {
     console.log('threadsUuid: ', threadsUuid);
 
     const [posts, setPosts] = useState([]);
+    const [thread, setThread] = useState({});
 
     useEffect(() => {
-        async function fetchData() {
-            try {
-                const response = await fetch(`http://localhost:8999/posts?thread_uuid=${threadsUuid}`);
+        fetchData(`http://localhost:8999/posts?thread_uuid=${threadsUuid}`)
+            .then(data => setPosts(data))
+            .catch(error => console.error('Error fetching data: ', error));
+    }, []);
 
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setPosts(data);
-            } catch (error) {
-                console.error('Error fetching data: ', error);
-            }
-        }
-
-        fetchData();
+    useEffect(() => {
+        fetchData(`http://localhost:8999/threads/${threadsUuid}`)
+            .then(data => setThread(data))
+            .catch(error => console.error('Error fetching data: ', error));
     }, []);
 
     return (
         <div className="container">
             <h1>Posts</h1>
-            <PostsPanel posts={posts} />
+            <PostsPanel posts={posts} thread={thread} />
         </div>
     )
 }
