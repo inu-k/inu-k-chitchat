@@ -1,26 +1,15 @@
 import { useEffect, useState } from "react"
 import ThreadPanel from "../components/ThreadPanel.jsx"
+import { fetchData } from "../functions/utils.jsx";
 
 // threads page
 export default function ThreadsPage() {
     const [threads, setThreads] = useState([]);
 
     useEffect(() => {
-        async function fetchData() {
-            try {
-                const response = await fetch('http://localhost:8999/threads');
-
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setThreads(data);
-            } catch (error) {
-                console.error('Error fetching data: ', error);
-            }
-        }
-
-        fetchData();
+        fetchData('http://localhost:8999/threads')
+            .then(data => setThreads(data))
+            .catch(error => console.error('Error fetching data: ', error));
     }, []);
 
     console.log(threads);

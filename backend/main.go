@@ -42,6 +42,7 @@ func main() {
 	c := cors.Default()
 	handler := c.Handler(mux)
 	mux.HandleFunc("/index", index)
+	mux.HandleFunc("/threads/", data.GetThread)
 	mux.HandleFunc("/threads", data.GetThreads)
 	mux.HandleFunc("/posts", data.GetPosts)
 

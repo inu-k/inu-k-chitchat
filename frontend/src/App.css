@@ -46,6 +46,7 @@
 
 .NavBar-bland {
   padding: 0px 15px;
+  width: fit-content;
   text-align: left;
   font-weight: bold;
   font-family: 'Roboto', sans-serif;
