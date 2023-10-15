@@ -3,6 +3,7 @@ import './App.css';
 import { useState, useEffect } from 'react';
 import Navbar from './components/NavBar.jsx';
 import ThreadsPage from './pages/ThreadsPage.jsx';
+import { CreateThreadPage } from './pages/CreateThreadPage';
 import { Routes, Route, Link } from 'react-router-dom';
 import PostsPage from './pages/PostsPage.jsx';
 import { fetchData } from './functions/utils.jsx';
@@ -29,6 +30,7 @@ function App() {
         } />
         <Route path="/threads" element={<ThreadsPage />} />
         <Route path="/posts" element={<PostsPage />} />
+        <Route path="/create_thread" element={<CreateThreadPage />} />
       </Routes>
 
 

@@ -43,7 +43,7 @@ func main() {
 	handler := c.Handler(mux)
 	mux.HandleFunc("/index", index)
 	mux.HandleFunc("/threads/", data.GetThread)
-	mux.HandleFunc("/threads", data.GetThreads)
+	mux.HandleFunc("/threads", data.HandleThreads)
 	mux.HandleFunc("/posts", data.GetPosts)
 
 	server := http.Server{

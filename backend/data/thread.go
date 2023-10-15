@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"path"
 	"time"
+
+	uuid "github.com/nu7hatch/gouuid"
 )
 
 type ThreadInfo struct {
@@ -116,5 +118,42 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(responseJson)
+	return
+}
+
+type TopicInfo struct {
+	Topic string `json:"topic"`
+}
+
+// create a new thread
+// POST /threads
+func CreateThread(w http.ResponseWriter, r *http.Request) {
+	len := r.ContentLength
+	body := make([]byte, len)
+	r.Body.Read(body)
+	var topicInfo TopicInfo
+	json.Unmarshal(body, &topicInfo)
+	topic := topicInfo.Topic
+	u4, err := uuid.NewV4()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	uuid := u4.String()
+	_, err = Db.Query("INSERT INTO threads (uuid, topic, user_id, created_at) VALUES ($1, $2, $3, $4)", uuid, topic, 1, time.Now())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	return
+}
+
+func HandleThreads(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		GetThreads(w, r)
+	case "POST":
+		CreateThread(w, r)
+	}
 	return
 }
