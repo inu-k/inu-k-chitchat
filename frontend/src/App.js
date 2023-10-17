@@ -21,11 +21,18 @@ function App() {
             <p>
               Welcome to inu-k-chitchat!
             </p>
-            <p>
-              <Link to='/threads'>
-                See Threads
-              </Link>
-            </p>
+            <div>
+              <p>
+                <Link to='/threads'>
+                  See Threads
+                </Link>
+              </p>
+              <p>
+                <Link to='/create_thread'>
+                  Create Thread
+                </Link>
+              </p>
+            </div>
           </div>
         } />
         <Route path="/threads" element={<ThreadsPage />} />

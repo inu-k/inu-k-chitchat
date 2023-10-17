@@ -145,6 +145,23 @@ func CreateThread(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// get new thread information
+	thread_info := ThreadInfo{}
+	err = Db.QueryRow("SELECT id, uuid, topic, user_id, created_at FROM threads WHERE uuid = $1", uuid).Scan(&thread_info.Id, &thread_info.Uuid, &thread_info.Topic, &thread_info.UserId, &thread_info.CreatedAt)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	responseJson, err := json.Marshal(thread_info)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(responseJson)
 	return
 }
 
