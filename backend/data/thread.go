@@ -2,6 +2,7 @@ package data
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"path"
 	"time"
@@ -122,9 +123,18 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 }
 
 type NewPostInfo struct {
-	Body     string `json:"body"`
-	UserId   int    `json:"userId"`
-	ThreadId int    `json:"threadId"`
+	Body       string `json:"body"`
+	UserId     int    `json:"userId"`
+	ThreadUuid string `json:"threadUuid"`
+}
+
+func GetThreadId(threadUuid string) (int, error) {
+	var threadId int
+	err := Db.QueryRow("SELECT id FROM threads WHERE uuid = $1", threadUuid).Scan(&threadId)
+	if err != nil {
+		return -1, err
+	}
+	return threadId, nil
 }
 
 // create a new post
@@ -137,12 +147,19 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &newPostInfo)
 	bodyText := newPostInfo.Body
 	userId := newPostInfo.UserId
-	threadId := newPostInfo.ThreadId
+	fmt.Println(newPostInfo.ThreadUuid)
+	threadId, err := GetThreadId(newPostInfo.ThreadUuid)
+	fmt.Println(threadId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	u4, err := uuid.NewV4()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	fmt.Println("a")
 	uuid := u4.String()
 	_, err = Db.Query("INSERT INTO posts (uuid, body, user_id, thread_id, created_at) VALUES ($1, $2, $3, $4, $5)", uuid, bodyText, userId, threadId, time.Now())
 	if err != nil {
@@ -152,11 +169,13 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 
 	// get new post information
 	post := Post{}
-	err = Db.QueryRow("SELECRT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE uuid = $1", uuid).Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt)
+	err = Db.QueryRow("SELECT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE uuid = $1", uuid).Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt)
 	if err != nil {
+		fmt.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	fmt.Println(post)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

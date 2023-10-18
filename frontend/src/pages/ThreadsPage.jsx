@@ -12,7 +12,7 @@ export default function ThreadsPage() {
             .catch(error => console.error('Error fetching data: ', error));
     }, []);
 
-    console.log(threads);
+
     return (
         <div className="container">
             <h1>Threads</h1>
