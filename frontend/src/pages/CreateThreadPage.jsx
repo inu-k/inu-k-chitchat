@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 function SetTopicName() {
 }
 
 export function CreateThreadPage() {
     const [topicName, setTopicName] = useState('')
-    const [redirect, setRedirect] = useState(false);
-    const [url, setUrl] = useState('');
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setTopicName(e.target.value);
@@ -28,16 +27,11 @@ export function CreateThreadPage() {
             }
             const retdata = await response.json();
             console.log('retdata: ', retdata);
-            setRedirect(true);
-            setUrl(`/posts?threads_uuid=${retdata.uuid}`);
+            navigate(`/posts?threads_uuid=${retdata.uuid}`);
         } catch (error) {
             console.error('Error fetching data: ', error);
             throw error;
         }
-    }
-
-    if (redirect) {
-        return (<Navigate replace to={url} />);
     }
 
     return (
