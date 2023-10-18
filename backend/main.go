@@ -44,7 +44,7 @@ func main() {
 	mux.HandleFunc("/index", index)
 	mux.HandleFunc("/threads/", data.GetThread)
 	mux.HandleFunc("/threads", data.HandleThreads)
-	mux.HandleFunc("/posts", data.GetPosts)
+	mux.HandleFunc("/posts", data.HandlePosts)
 
 	server := http.Server{
 		Addr:    "127.0.0.1:8999",

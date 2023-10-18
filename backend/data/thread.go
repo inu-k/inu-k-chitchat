@@ -169,6 +169,16 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func HandlePosts(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		GetPosts(w, r)
+	case "POST":
+		CreatePost(w, r)
+	}
+	return
+}
+
 type TopicInfo struct {
 	Topic string `json:"topic"`
 }
