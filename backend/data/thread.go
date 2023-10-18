@@ -121,6 +121,54 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+type NewPostInfo struct {
+	Body     string `json:"body"`
+	UserId   int    `json:"userId"`
+	ThreadId int    `json:"threadId"`
+}
+
+// create a new post
+// POST /posts
+func CreatePost(w http.ResponseWriter, r *http.Request) {
+	len := r.ContentLength
+	body := make([]byte, len)
+	r.Body.Read(body)
+	var newPostInfo NewPostInfo
+	json.Unmarshal(body, &newPostInfo)
+	bodyText := newPostInfo.Body
+	userId := newPostInfo.UserId
+	threadId := newPostInfo.ThreadId
+	u4, err := uuid.NewV4()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	uuid := u4.String()
+	_, err = Db.Query("INSERT INTO posts (uuid, body, user_id, thread_id, created_at) VALUES ($1, $2, $3, $4, $5)", uuid, bodyText, userId, threadId, time.Now())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// get new post information
+	post := Post{}
+	err = Db.QueryRow("SELECRT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE uuid = $1", uuid).Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	responseJson, err := json.Marshal(post)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(responseJson)
+	return
+}
+
 type TopicInfo struct {
 	Topic string `json:"topic"`
 }
