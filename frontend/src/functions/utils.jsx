@@ -19,8 +19,8 @@ export function formatDate(date) {
     const month = createdAt.getMonth() + 1;
     const day = createdAt.getDate();
     const hours = createdAt.getHours();
-    const minutes = createdAt.getMinutes();
-    const seconds = createdAt.getSeconds();
+    const minutes = ('0' + createdAt.getMinutes()).slice(-2);
+    const seconds = ('0' + createdAt.getSeconds()).slice(-2);
 
     const formattedData = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     return formattedData;
