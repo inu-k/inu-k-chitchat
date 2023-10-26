@@ -2,9 +2,12 @@ package data
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"path"
 	"time"
+
+	uuid "github.com/nu7hatch/gouuid"
 )
 
 type ThreadInfo struct {
@@ -116,5 +119,135 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(responseJson)
+	return
+}
+
+type NewPostInfo struct {
+	Body       string `json:"body"`
+	UserId     int    `json:"userId"`
+	ThreadUuid string `json:"threadUuid"`
+}
+
+func GetThreadId(threadUuid string) (int, error) {
+	var threadId int
+	err := Db.QueryRow("SELECT id FROM threads WHERE uuid = $1", threadUuid).Scan(&threadId)
+	if err != nil {
+		return -1, err
+	}
+	return threadId, nil
+}
+
+// create a new post
+// POST /posts
+func CreatePost(w http.ResponseWriter, r *http.Request) {
+	len := r.ContentLength
+	body := make([]byte, len)
+	r.Body.Read(body)
+	var newPostInfo NewPostInfo
+	json.Unmarshal(body, &newPostInfo)
+	bodyText := newPostInfo.Body
+	userId := newPostInfo.UserId
+	fmt.Println(newPostInfo.ThreadUuid)
+	threadId, err := GetThreadId(newPostInfo.ThreadUuid)
+	fmt.Println(threadId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	u4, err := uuid.NewV4()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Println("a")
+	uuid := u4.String()
+	_, err = Db.Query("INSERT INTO posts (uuid, body, user_id, thread_id, created_at) VALUES ($1, $2, $3, $4, $5)", uuid, bodyText, userId, threadId, time.Now())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// get new post information
+	post := Post{}
+	err = Db.QueryRow("SELECT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE uuid = $1", uuid).Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt)
+	if err != nil {
+		fmt.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Println(post)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	responseJson, err := json.Marshal(post)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(responseJson)
+	return
+}
+
+func HandlePosts(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		GetPosts(w, r)
+	case "POST":
+		CreatePost(w, r)
+	}
+	return
+}
+
+type TopicInfo struct {
+	Topic string `json:"topic"`
+}
+
+// create a new thread
+// POST /threads
+func CreateThread(w http.ResponseWriter, r *http.Request) {
+	len := r.ContentLength
+	body := make([]byte, len)
+	r.Body.Read(body)
+	var topicInfo TopicInfo
+	json.Unmarshal(body, &topicInfo)
+	topic := topicInfo.Topic
+	u4, err := uuid.NewV4()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	uuid := u4.String()
+	_, err = Db.Query("INSERT INTO threads (uuid, topic, user_id, created_at) VALUES ($1, $2, $3, $4)", uuid, topic, 1, time.Now())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// get new thread information
+	thread_info := ThreadInfo{}
+	err = Db.QueryRow("SELECT id, uuid, topic, user_id, created_at FROM threads WHERE uuid = $1", uuid).Scan(&thread_info.Id, &thread_info.Uuid, &thread_info.Topic, &thread_info.UserId, &thread_info.CreatedAt)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	responseJson, err := json.Marshal(thread_info)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(responseJson)
+	return
+}
+
+func HandleThreads(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		GetThreads(w, r)
+	case "POST":
+		CreateThread(w, r)
+	}
 	return
 }

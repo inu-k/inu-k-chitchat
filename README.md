@@ -9,7 +9,7 @@ DB_PASSWORD=<postgresのパスワード>
 ```
 
 ```bash
-$ <Postgresを起動>
+$ sudo /etc/init.d/postgresql start # postgresの起動(例)
 $ createdb chitchat
 $ cd backend
 $ psql -f data/setup.sql -d chitchat  # テーブルの作成、初期データの挿入
@@ -27,5 +27,8 @@ $ npm start  # localhost:3000でフロントエンドが起動
 ## 機能
 - 作成されたスレッドの一覧表示
 - スレッドに投稿された投稿の表示
+- 新規スレッドの作成
+- 新規投稿の作成
 
-現状ではスレッドの作成、投稿の作成はできず、データベースにあるデータを表示するだけの状態です。
+## ToDo
+-  ユーザー作成や認証に関する機能
