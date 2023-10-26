@@ -9,7 +9,7 @@ DB_PASSWORD=<postgresのパスワード>
 ```
 
 ```bash
-$ sudo /etc/init.d/postgresql start # postgresの起動
+$ sudo /etc/init.d/postgresql start # postgresの起動(例)
 $ createdb chitchat
 $ cd backend
 $ psql -f data/setup.sql -d chitchat  # テーブルの作成、初期データの挿入
