@@ -2,7 +2,6 @@ package data
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"path"
 	"time"
@@ -19,13 +18,37 @@ type ThreadInfo struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
-type Post struct {
-	Id        int       `json:"id"`
-	Uuid      string    `json:"uuid"`
-	Body      string    `json:"body"`
-	UserId    int       `json:"userId"`
-	ThreadId  int       `json:"threadId"`
-	CreatedAt time.Time `json:"createdAt"`
+type TopicInfo struct {
+	Topic string `json:"topic"`
+}
+
+// get all threads in the database
+func RetrieveAllThreads() ([]ThreadInfo, error) {
+	rows, err := Db.Query("select A.*, COUNT(B.id) as post_num from threads as A left join posts as B on B.thread_id=A.id group by A.id, A.uuid, A.topic, A.user_id, A.created_at ORDER BY A.created_at DESC")
+	if err != nil {
+		return nil, err
+	}
+
+	threads := make([]ThreadInfo, 0)
+	for rows.Next() {
+		thread := ThreadInfo{}
+		if err = rows.Scan(&thread.Id, &thread.Uuid, &thread.Topic, &thread.UserId, &thread.CreatedAt, &thread.PostsNum); err != nil {
+			return nil, err
+		}
+		threads = append(threads, thread)
+	}
+	rows.Close()
+	return threads, nil
+}
+
+// get a thread from a thread uuid
+func RetrieveThreadInfoFromUuid(threadUuid string) (ThreadInfo, error) {
+	thread_info := ThreadInfo{}
+	err := Db.QueryRow("SELECT id, uuid, topic, user_id, created_at FROM threads WHERE uuid = $1", threadUuid).Scan(&thread_info.Id, &thread_info.Uuid, &thread_info.Topic, &thread_info.UserId, &thread_info.CreatedAt)
+	if err != nil {
+		return thread_info, err
+	}
+	return thread_info, nil
 }
 
 // get all threads in the database with a number of posts and returns it
@@ -33,22 +56,12 @@ type Post struct {
 func GetThreads(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 
-	rows, err := Db.Query("select A.*, COUNT(B.id) as post_num from threads as A left join posts as B on B.thread_id=A.id group by A.id, A.uuid, A.topic, A.user_id, A.created_at ORDER BY A.created_at DESC")
+	threads, err := RetrieveAllThreads()
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	threads := make([]ThreadInfo, 0)
-	for rows.Next() {
-		thread := ThreadInfo{}
-		if err = rows.Scan(&thread.Id, &thread.Uuid, &thread.Topic, &thread.UserId, &thread.CreatedAt, &thread.PostsNum); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		threads = append(threads, thread)
-	}
-	rows.Close()
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -65,8 +78,7 @@ func GetThreads(w http.ResponseWriter, r *http.Request) {
 // GET /threads/thread_uuid
 func GetThread(w http.ResponseWriter, r *http.Request) {
 	thread_uuid := path.Base(r.URL.Path)
-	thread_info := ThreadInfo{}
-	err := Db.QueryRow("SELECT id, uuid, topic, user_id, created_at FROM threads WHERE uuid = $1", thread_uuid).Scan(&thread_info.Id, &thread_info.Uuid, &thread_info.Topic, &thread_info.UserId, &thread_info.CreatedAt)
+	thread_info, err := RetrieveThreadInfoFromUuid(thread_uuid)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -81,125 +93,6 @@ func GetThread(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(responseJson)
 	return
-}
-
-// get posts to a thread
-// GET /posts?thread_uuid=1
-func GetPosts(w http.ResponseWriter, r *http.Request) {
-	vals := r.URL.Query()
-	threadUuid := vals.Get("thread_uuid")
-	var threadId int
-	err := Db.QueryRow("SELECT id FROM threads WHERE uuid = $1", threadUuid).Scan(&threadId)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	posts := make([]Post, 0)
-	rows, err := Db.Query("SELECT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE thread_id = $1 ORDER BY created_at", threadId)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	for rows.Next() {
-		post := Post{}
-		if err = rows.Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		posts = append(posts, post)
-	}
-	rows.Close()
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	responseJson, err := json.Marshal(posts)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Write(responseJson)
-	return
-}
-
-type NewPostInfo struct {
-	Body       string `json:"body"`
-	UserId     int    `json:"userId"`
-	ThreadUuid string `json:"threadUuid"`
-}
-
-func GetThreadId(threadUuid string) (int, error) {
-	var threadId int
-	err := Db.QueryRow("SELECT id FROM threads WHERE uuid = $1", threadUuid).Scan(&threadId)
-	if err != nil {
-		return -1, err
-	}
-	return threadId, nil
-}
-
-// create a new post
-// POST /posts
-func CreatePost(w http.ResponseWriter, r *http.Request) {
-	len := r.ContentLength
-	body := make([]byte, len)
-	r.Body.Read(body)
-	var newPostInfo NewPostInfo
-	json.Unmarshal(body, &newPostInfo)
-	bodyText := newPostInfo.Body
-	userId := newPostInfo.UserId
-	fmt.Println(newPostInfo.ThreadUuid)
-	threadId, err := GetThreadId(newPostInfo.ThreadUuid)
-	fmt.Println(threadId)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	u4, err := uuid.NewV4()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	fmt.Println("a")
-	uuid := u4.String()
-	_, err = Db.Query("INSERT INTO posts (uuid, body, user_id, thread_id, created_at) VALUES ($1, $2, $3, $4, $5)", uuid, bodyText, userId, threadId, time.Now())
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// get new post information
-	post := Post{}
-	err = Db.QueryRow("SELECT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE uuid = $1", uuid).Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt)
-	if err != nil {
-		fmt.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	fmt.Println(post)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	responseJson, err := json.Marshal(post)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Write(responseJson)
-	return
-}
-
-func HandlePosts(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "GET":
-		GetPosts(w, r)
-	case "POST":
-		CreatePost(w, r)
-	}
-	return
-}
-
-type TopicInfo struct {
-	Topic string `json:"topic"`
 }
 
 // create a new thread
@@ -224,8 +117,7 @@ func CreateThread(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get new thread information
-	thread_info := ThreadInfo{}
-	err = Db.QueryRow("SELECT id, uuid, topic, user_id, created_at FROM threads WHERE uuid = $1", uuid).Scan(&thread_info.Id, &thread_info.Uuid, &thread_info.Topic, &thread_info.UserId, &thread_info.CreatedAt)
+	ThreadInfo, err := RetrieveThreadInfoFromUuid(uuid)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -233,7 +125,7 @@ func CreateThread(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	responseJson, err := json.Marshal(thread_info)
+	responseJson, err := json.Marshal(ThreadInfo)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
