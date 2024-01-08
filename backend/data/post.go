@@ -23,12 +23,14 @@ type NewPostInfo struct {
 	ThreadUuid string `json:"threadUuid"`
 }
 
+// get posts to a thread, given a thread id
 func RetrievePostsFromThreadId(threadId int) ([]Post, error) {
 	posts := make([]Post, 0)
 	rows, err := Db.Query("SELECT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE thread_id = $1 ORDER BY created_at", threadId)
 	if err != nil {
 		return nil, err
 	}
+	// make list of posts
 	for rows.Next() {
 		post := Post{}
 		if err = rows.Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt); err != nil {
@@ -40,6 +42,7 @@ func RetrievePostsFromThreadId(threadId int) ([]Post, error) {
 	return posts, nil
 }
 
+// get a post from a post uuid
 func RetrievePostFromUuid(postUuid string) (Post, error) {
 	post := Post{}
 	err := Db.QueryRow("SELECT id, uuid, body, user_id, thread_id, created_at FROM posts WHERE uuid = $1", postUuid).Scan(&post.Id, &post.Uuid, &post.Body, &post.UserId, &post.ThreadId, &post.CreatedAt)
@@ -49,6 +52,7 @@ func RetrievePostFromUuid(postUuid string) (Post, error) {
 	return post, nil
 }
 
+// get a thread id from a thread uuid
 func RetrieveThreadIdFromUuid(threadUuid string) (int, error) {
 	var threadId int
 	err := Db.QueryRow("SELECT id FROM threads WHERE uuid = $1", threadUuid).Scan(&threadId)
@@ -103,12 +107,14 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	// generate uuid for new post
 	u4, err := uuid.NewV4()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// insert new post into database
 	uuid := u4.String()
 	_, err = Db.Query("INSERT INTO posts (uuid, body, user_id, thread_id, created_at) VALUES ($1, $2, $3, $4, $5)", uuid, bodyText, userId, threadId, time.Now())
 	if err != nil {
@@ -135,6 +141,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+// handle function for /posts
 func HandlePosts(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":

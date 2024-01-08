@@ -22,6 +22,7 @@ type TopicInfo struct {
 	Topic string `json:"topic"`
 }
 
+// get all threads in the database
 func RetrieveAllThreads() ([]ThreadInfo, error) {
 	rows, err := Db.Query("select A.*, COUNT(B.id) as post_num from threads as A left join posts as B on B.thread_id=A.id group by A.id, A.uuid, A.topic, A.user_id, A.created_at ORDER BY A.created_at DESC")
 	if err != nil {
@@ -40,6 +41,7 @@ func RetrieveAllThreads() ([]ThreadInfo, error) {
 	return threads, nil
 }
 
+// get a thread from a thread uuid
 func RetrieveThreadInfoFromUuid(threadUuid string) (ThreadInfo, error) {
 	thread_info := ThreadInfo{}
 	err := Db.QueryRow("SELECT id, uuid, topic, user_id, created_at FROM threads WHERE uuid = $1", threadUuid).Scan(&thread_info.Id, &thread_info.Uuid, &thread_info.Topic, &thread_info.UserId, &thread_info.CreatedAt)
