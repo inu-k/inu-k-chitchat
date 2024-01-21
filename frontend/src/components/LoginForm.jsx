@@ -15,6 +15,8 @@ export default function LoginForm() {
                 credentials: 'include',
             });
 
+            console.log('cookie: ', document.cookie)
+
             if (response.ok) {
                 navigate('/');
             } else {
