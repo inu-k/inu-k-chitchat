@@ -40,7 +40,11 @@ func index(w http.ResponseWriter, r *http.Request) {
 func main() {
 	mux := http.NewServeMux()
 
-	c := cors.Default()
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},            // 許可するオリジン
+		AllowedMethods:   []string{"GET", "POST", "DELETE", "OPTIONS"}, // 許可するHTTPメソッド
+		AllowCredentials: true,                                         // クレデンシャルを許可
+	})
 	handler := c.Handler(mux)
 	mux.HandleFunc("/index", index)
 	mux.HandleFunc("/threads/", data.GetThread)
@@ -48,6 +52,7 @@ func main() {
 	mux.HandleFunc("/posts", data.HandlePosts)
 	mux.HandleFunc("/users/me", data.HandleUsersMe)
 	mux.HandleFunc("/users", data.HandleUsers)
+	mux.HandleFunc("/sessions/me", data.HandleSessionsMe)
 	mux.HandleFunc("/sessions", data.HandleSessions)
 
 	server := http.Server{

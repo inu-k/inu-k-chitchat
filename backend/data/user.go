@@ -54,6 +54,26 @@ func CalcHash(plaintext string) string {
 	return fmt.Sprintf("%x", r)
 }
 
+// create a new session, save session info into the database
+func CreateSession(user User) (session Session, err error) {
+	// generate uuid for new session
+	u4, err := uuid.NewV4()
+	if err != nil {
+		return
+	}
+	uuid := u4.String()
+
+	// insert into sessions table
+	_, err = Db.Exec("INSERT INTO sessions (uuid, email, user_id, created_at) VALUES ($1, $2, $3, $4)", uuid, user.Email, user.Id, time.Now())
+	if err != nil {
+		return
+	}
+
+	// get new session information
+	session, err = RetrieveSessionFromUuid(uuid)
+	return
+}
+
 // create a new user, save user info into the database
 // POST /users
 func CreateUser(w http.ResponseWriter, r *http.Request) (err error) {
@@ -91,7 +111,7 @@ func GetMyInfo(w http.ResponseWriter, r *http.Request) (err error) {
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 
-	cookie, err := r.Cookie("cookie")
+	cookie, err := r.Cookie("_cookie")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		// return
@@ -124,7 +144,6 @@ func GetMyInfo(w http.ResponseWriter, r *http.Request) (err error) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	responseJson, err := json.Marshal(userInfo)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -134,31 +153,11 @@ func GetMyInfo(w http.ResponseWriter, r *http.Request) (err error) {
 	return
 }
 
-func CreateSession(user User) (session Session, err error) {
-	// generate uuid for new session
-	u4, err := uuid.NewV4()
-	if err != nil {
-		return
-	}
-	uuid := u4.String()
-
-	// insert into sessions table
-	_, err = Db.Exec("INSERT INTO sessions (uuid, email, user_id, created_at) VALUES ($1, $2, $3, $4)", uuid, user.Email, user.Id, time.Now())
-	if err != nil {
-		return
-	}
-
-	// get new session information
-	session, err = RetrieveSessionFromUuid(uuid)
-	return
-}
-
 // check email and password
 // /POST /sessions
 func Authenticate(w http.ResponseWriter, r *http.Request) (err error) {
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
-
 	// get user info form
 	email := r.FormValue("email")
 	password := r.FormValue("password")
@@ -181,18 +180,59 @@ func Authenticate(w http.ResponseWriter, r *http.Request) (err error) {
 		}
 
 		cookie := http.Cookie{
-			Name:  "cookie",
+			Name:  "_cookie",
 			Value: session.Uuid,
 			// HttpOnly: true,
 		}
 		http.SetCookie(w, &cookie)
 		fmt.Println(cookie)
 		fmt.Println("Set cookie")
+		w.WriteHeader(http.StatusOK)
 		return err
 	}
 }
 
+// delete session by uuid
+func DeleteSessionByUuid(uuid string) (err error) {
+	_, err = Db.Exec("DELETE FROM sessions WHERE uuid = $1", uuid)
+	return
+}
+
+// delete session
+// DELETE /sessions/me
+func DeleteSessionMe(w http.ResponseWriter, r *http.Request) (err error) {
+	fmt.Println("Delete session")
+
+	// get session uuid from cookie
+	cookie, err := r.Cookie("_cookie")
+	if err == http.ErrNoCookie {
+		fmt.Println("Warning: No cookie")
+		w.WriteHeader(http.StatusOK)
+		return
+	} else if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	uuid := cookie.Value
+
+	// delete cookie
+	cookie.MaxAge = -1
+
+	// delete session
+	err = DeleteSessionByUuid(uuid)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.SetCookie(w, cookie)
+	w.WriteHeader(http.StatusOK)
+	return
+}
+
 func HandleUsersMe(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("HandleUsersMe")
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	switch r.Method {
 	case "GET":
 		GetMyInfo(w, r)
@@ -200,6 +240,7 @@ func HandleUsersMe(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleUsers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 	switch r.Method {
 	case "POST":
 		CreateUser(w, r)
@@ -207,8 +248,24 @@ func HandleUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleSessions(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	switch r.Method {
 	case "POST":
 		Authenticate(w, r)
+	}
+}
+
+func HandleSessionsMe(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("HandleSessionsMe")
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	switch r.Method {
+	case "OPTIONS":
+		w.WriteHeader(http.StatusNoContent)
+	case "DELETE":
+		DeleteSessionMe(w, r)
 	}
 }
