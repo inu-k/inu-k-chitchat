@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react';
 import { fetchData } from '../functions/utils';
 
 // header
-export default function NavBar() {
+export default function NavBar({ isLoggedIn, setIsLoggedIn }) {
     const [userInfo, setUserInfo] = useState({});
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
         console.log('useEffect users/me');
@@ -22,6 +21,7 @@ export default function NavBar() {
                 setUserInfo(data);
                 console.log('response data: ', data);
                 if (Object.keys(data).length !== 0) {
+                    console.log('setIsLoggedIn(true)');
                     setIsLoggedIn(true);
                 }
             } catch (error) {

@@ -1,7 +1,7 @@
 import '../App.js'
 import { Link, useNavigate } from 'react-router-dom';
 
-export default function LoginForm() {
+export default function LoginForm({ setIsLoggedIn }) {
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -18,6 +18,7 @@ export default function LoginForm() {
             console.log('cookie: ', document.cookie)
 
             if (response.ok) {
+                setIsLoggedIn(true);
                 navigate('/');
             } else {
                 throw new Error('Network response was not ok');

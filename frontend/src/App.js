@@ -11,10 +11,12 @@ import LoginForm from './components/LoginForm.jsx';
 import SignupForm from './components/SignupForm.jsx';
 
 function App() {
+  const [isloggedin, setIsloggedin] = useState(false);
+
   return (
     <div className="App">
       <header>
-        <Navbar />
+        <Navbar isloggedin={isloggedin} setIsLoggedIn={setIsloggedin} />
       </header>
 
       <Routes>
@@ -40,7 +42,7 @@ function App() {
         <Route path="/threads" element={<ThreadsPage />} />
         <Route path="/posts" element={<PostsPage />} />
         <Route path="/create_thread" element={<CreateThreadPage />} />
-        <Route path="/login" element={<LoginForm />} />
+        <Route path="/login" element={<LoginForm setIsLoggedIn={setIsloggedin} />} />
         <Route path="/signup" element={<SignupForm />} />
       </Routes>
 
