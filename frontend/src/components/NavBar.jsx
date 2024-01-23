@@ -1,4 +1,4 @@
-import { Link, Navigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Cookie from 'js-cookie';
 import { useEffect, useState } from 'react';
 import { fetchData } from '../functions/utils';
@@ -6,10 +6,10 @@ import { fetchData } from '../functions/utils';
 // header
 export default function NavBar({ isLoggedIn, setIsLoggedIn }) {
     const [userInfo, setUserInfo] = useState({});
+    const navigate = useNavigate();
 
     useEffect(() => {
         console.log('useEffect users/me');
-        setIsLoggedIn(false);
 
         const fetchUserInfo = async () => {
             try {
@@ -21,8 +21,9 @@ export default function NavBar({ isLoggedIn, setIsLoggedIn }) {
                 setUserInfo(data);
                 console.log('response data: ', data);
                 if (Object.keys(data).length !== 0) {
-                    console.log('setIsLoggedIn(true)');
                     setIsLoggedIn(true);
+                } else {
+                    setIsLoggedIn(false);
                 }
             } catch (error) {
                 console.error('Error fetching data: ', error);
@@ -44,7 +45,7 @@ export default function NavBar({ isLoggedIn, setIsLoggedIn }) {
             });
 
             if (response.ok) {
-                Navigate('/');
+                navigate('/');
             } else {
                 console.error('Network response was not ok', response);
             }
