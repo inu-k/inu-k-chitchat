@@ -30,8 +30,10 @@ export default function NavBar({ isLoggedIn, setIsLoggedIn }) {
             }
         }
 
-        fetchUserInfo();
-    }, []);
+        if (isLoggedIn) {
+            fetchUserInfo();
+        }
+    }, [isLoggedIn]);
 
     const HandleLogout = async (e) => {
         e.preventDefault();
