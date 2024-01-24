@@ -45,7 +45,7 @@ export function CreatePostPanel({ thread, isLoggedIn }) {
                 </form >
             ) : (
                 <div style={{ padding: "10px" }}>
-                    <div>Please <Link to='/login'>login</Link> to post a reply.</div>
+                    <div>Please <Link to='/login'>login</Link> to send a post.</div>
                 </div>
             )}
         </div>
