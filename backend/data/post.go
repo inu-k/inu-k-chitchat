@@ -2,6 +2,7 @@ package data
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -18,8 +19,8 @@ type Post struct {
 }
 
 type NewPostInfo struct {
-	Body       string `json:"body"`
-	UserId     int    `json:"userId"`
+	Body string `json:"body"`
+	// UserUuid   int    `json:"userUuid"`
 	ThreadUuid string `json:"threadUuid"`
 }
 
@@ -93,13 +94,38 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 // create a new post
 // POST /posts
 func CreatePost(w http.ResponseWriter, r *http.Request) {
+	// get session uuid from cookie
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	cookie, err := r.Cookie("_cookie")
+	fmt.Println(cookie)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		// return
+		if err == http.ErrNoCookie {
+			fmt.Println("No cookie in CreatePost")
+			return
+		}
+		return
+	}
+	sessionUuid := cookie.Value
+
+	// get session information
+	session, err := RetrieveSessionFromUuid(sessionUuid)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	len := r.ContentLength
 	body := make([]byte, len)
 	r.Body.Read(body)
 	var newPostInfo NewPostInfo
 	json.Unmarshal(body, &newPostInfo)
 	bodyText := newPostInfo.Body
-	userId := newPostInfo.UserId
+	userId := session.UserId
 	// fmt.Println(newPostInfo.ThreadUuid)
 	threadId, err := RetrieveThreadIdFromUuid(newPostInfo.ThreadUuid)
 	// fmt.Println(threadId)
@@ -143,6 +169,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 
 // handle function for /posts
 func HandlePosts(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
 	switch r.Method {
 	case "GET":
 		GetPosts(w, r)

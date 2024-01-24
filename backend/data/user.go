@@ -23,6 +23,7 @@ type User struct {
 type UserInfo struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
+	Uuid  string `json:"uuid"`
 }
 
 type Session struct {
@@ -141,6 +142,7 @@ func GetMyInfo(w http.ResponseWriter, r *http.Request) (err error) {
 	userInfo := UserInfo{
 		Name:  user.Name,
 		Email: user.Email,
+		Uuid:  user.Uuid,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
