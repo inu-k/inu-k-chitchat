@@ -5,7 +5,7 @@ import { fetchData } from '../functions/utils.jsx';
 
 // show posts page
 // posts to a thread with thread information
-export default function PostsPage() {
+export default function PostsPage({ isLoggedIn }) {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const threadsUuid = queryParams.get('threads_uuid');
@@ -29,7 +29,7 @@ export default function PostsPage() {
     return (
         <div className="container">
             <h1>Posts</h1>
-            <PostsPanel posts={posts} thread={thread} />
+            <PostsPanel posts={posts} thread={thread} isLoggedIn={isLoggedIn} />
         </div>
     )
 }

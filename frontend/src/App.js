@@ -32,16 +32,21 @@ function App() {
                 </Link>
               </p>
               <p>
-                <Link to='/create_thread'>
-                  Create Thread
-                </Link>
+                {isLoggedIn ? (
+                  <Link to='/create_thread'>
+                    Create Thread
+                  </Link>) : (
+                  <div style={{ padding: "10px" }}>
+                    <div>Please <Link to='/login'>login</Link> to create a thread.</div>
+                  </div>
+                )}
               </p>
             </div>
           </div>
         } />
         <Route path="/threads" element={<ThreadsPage />} />
-        <Route path="/posts" element={<PostsPage />} />
-        <Route path="/create_thread" element={<CreateThreadPage />} />
+        <Route path="/posts" element={<PostsPage isLoggedIn={isLoggedIn} />} />
+        <Route path="/create_thread" element={<CreateThreadPage isLoggedIn={isLoggedIn} />} />
         <Route path="/login" element={<LoginForm setIsLoggedIn={setIsLoggedIn} />} />
         <Route path="/signup" element={<SignupForm />} />
       </Routes>

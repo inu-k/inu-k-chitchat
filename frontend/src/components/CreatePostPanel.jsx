@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { Navigate, useNavigate, useLocation, Link } from 'react-router-dom';
 
 
-export function CreatePostPanel({ thread }) {
+export function CreatePostPanel({ thread, isLoggedIn }) {
     const [bodyText, setBodyText] = useState('');
     const navigate = useNavigate();
 
@@ -35,11 +35,20 @@ export function CreatePostPanel({ thread }) {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <textarea type='text' value={bodyText} onChange={handleChange} />
-                <button type='submit'>Send post!</button>
-            </div>
-        </form>
+        <div>
+            {isLoggedIn ? (
+                < form onSubmit={handleSubmit} >
+                    <div>
+                        <textarea type='text' value={bodyText} onChange={handleChange} />
+                        < button type='submit' > Send post!</button >
+                    </div >
+                </form >
+            ) : (
+                <div style={{ padding: "10px" }}>
+                    <div>Please <Link to='/login'>login</Link> to post a reply.</div>
+                </div>
+            )}
+        </div>
+
     );
 }

@@ -2,7 +2,7 @@ import { formatDate } from '../functions/utils.jsx';
 import { CreatePostPanel } from './CreatePostPanel.jsx';
 
 // show posts to a thread
-export default function PostsPanel({ posts, thread }) {
+export default function PostsPanel({ posts, thread, isLoggedIn }) {
 
     return (
         <div>
@@ -18,14 +18,14 @@ export default function PostsPanel({ posts, thread }) {
                                     {post.body}
                                 </div>
                                 <div>
-                                    {`作成者ID: ${post.userId} - 作成日時: ${formatDate(post.createdAt)}`}
+                                    {`started by: ${post.userId} - created at: ${formatDate(post.createdAt)}`}
                                 </div>
                             </div>
                         )
                     })
                 }
             </div>
-            <CreatePostPanel thread={thread} />
+            <CreatePostPanel thread={thread} isLoggedIn={isLoggedIn} />
         </div>
     )
 }

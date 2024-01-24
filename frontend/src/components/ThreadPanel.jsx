@@ -10,7 +10,7 @@ export default function ThreadPanel({ thread }) {
                 {thread.topic}
             </div>
             <div className='thread-panel-body'>
-                {`作成者ID: ${thread.userId} - 作成日時: ${formatDate(thread.createdAt)} - 投稿数: ${thread.postsNum}.  `}
+                {`started by: ${thread.userId} - created at: ${formatDate(thread.createdAt)} - number of posts: ${thread.postsNum}.  `}
                 <Link to={`/posts?threads_uuid=${thread.uuid}`}>
                     Read more
                 </Link>

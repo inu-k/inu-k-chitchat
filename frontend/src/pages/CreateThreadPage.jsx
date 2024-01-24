@@ -1,9 +1,6 @@
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 
-function SetTopicName() {
-}
-
 export function CreateThreadPage() {
     const [topicName, setTopicName] = useState('')
     const navigate = useNavigate();
