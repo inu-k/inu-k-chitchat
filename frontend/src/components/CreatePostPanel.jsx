@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { Navigate, useNavigate, useLocation, Link } from 'react-router-dom';
-
+import { Link } from 'react-router-dom';
+import { fetchUserInfo } from '../functions/utils';
 
 export function CreatePostPanel({ thread, isLoggedIn }) {
     const [bodyText, setBodyText] = useState('');
-    const navigate = useNavigate();
 
 
     const handleChange = (e) => {
@@ -14,9 +13,9 @@ export function CreatePostPanel({ thread, isLoggedIn }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log('thread:', thread)
+
         const data = {
             'body': bodyText,
-            'userId': 1,
             'threadUuid': thread.uuid
         };
 
@@ -24,13 +23,14 @@ export function CreatePostPanel({ thread, isLoggedIn }) {
             const response = await fetch('http://localhost:8999/posts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                credentials: 'include',
             })
             const retdata = await response.json();
             window.location.reload();
         } catch (error) {
-            console.error('Error fetching data: ', error);
-            throw error;
+            console.error('Error creating a post: ', error);
+            // throw error;
         }
     }
 

@@ -25,3 +25,18 @@ export function formatDate(date) {
     const formattedData = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     return formattedData;
 }
+
+export async function fetchUserInfo() {
+    try {
+        const data = await fetchData('http://localhost:8999/users/me', {
+            mode: 'cors',
+            credentials: 'include',
+        });
+        console.log('response data in utils: ', data);
+
+        return data;
+    } catch (error) {
+        console.error('Error fetching data in fetchUserInfo: ', error);
+        throw error;
+    }
+}

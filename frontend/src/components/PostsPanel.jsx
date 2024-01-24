@@ -18,7 +18,7 @@ export default function PostsPanel({ posts, thread, isLoggedIn }) {
                                     {post.body}
                                 </div>
                                 <div>
-                                    {`started by: ${post.userId} - created at: ${formatDate(post.createdAt)}`}
+                                    {`posted by: ${post.userId} - created at: ${formatDate(post.createdAt)}`}
                                 </div>
                             </div>
                         )

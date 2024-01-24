@@ -17,17 +17,15 @@ export function CreateThreadPage() {
             const response = await fetch('http://localhost:8999/threads', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                credentials: 'include',
             })
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
             const retdata = await response.json();
             console.log('retdata: ', retdata);
             navigate(`/posts?threads_uuid=${retdata.uuid}`);
         } catch (error) {
-            console.error('Error fetching data: ', error);
-            throw error;
+            console.error('Error creating a thread: ', error);
+            // throw error;
         }
     }
 

@@ -1,37 +1,39 @@
 import { Link, useNavigate } from 'react-router-dom';
 import Cookie from 'js-cookie';
 import { useEffect, useState } from 'react';
-import { fetchData } from '../functions/utils';
+import { fetchUserInfo } from '../functions/utils';
 
 // header
 export default function NavBar({ isLoggedIn, setIsLoggedIn }) {
     const [userInfo, setUserInfo] = useState({});
     const navigate = useNavigate();
 
-    useEffect(() => {
-        console.log('useEffect users/me');
+    async function getUserInfoAndUpdateStatus() {
+        try {
+            const data = await fetchUserInfo()
 
-        const fetchUserInfo = async () => {
-            try {
-                const data = await fetchData('http://localhost:8999/users/me', {
-                    mode: 'cors',
-                    credentials: 'include',
-                });
+            console.log('data: ', data);
+            setUserInfo(data);
 
-                setUserInfo(data);
-                console.log('response data: ', data);
-                if (Object.keys(data).length !== 0) {
-                    setIsLoggedIn(true);
-                } else {
-                    setIsLoggedIn(false);
-                }
-            } catch (error) {
-                console.error('Error fetching data: ', error);
+            if (Object.keys(data).length !== 0) {
+                setIsLoggedIn(true);
+            } else {
+                setIsLoggedIn(false);
             }
         }
+        catch (error) {
+            console.error('Error fetching data: ', error);
+        }
+    }
 
+    useEffect(() => {
+        getUserInfoAndUpdateStatus();
+    }, [])
+
+    useEffect(() => {
+        console.log('useEffect users/me');
         if (isLoggedIn) {
-            fetchUserInfo();
+            getUserInfoAndUpdateStatus();
         }
     }, [isLoggedIn]);
 

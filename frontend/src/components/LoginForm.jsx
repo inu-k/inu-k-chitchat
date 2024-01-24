@@ -18,6 +18,7 @@ export default function LoginForm({ setIsLoggedIn }) {
             console.log('cookie: ', document.cookie)
 
             if (response.ok) {
+                console.log('success to login');
                 setIsLoggedIn(true);
                 navigate('/');
             } else {
