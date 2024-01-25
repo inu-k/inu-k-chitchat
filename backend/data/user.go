@@ -218,7 +218,10 @@ func DeleteSessionMe(w http.ResponseWriter, r *http.Request) (err error) {
 	uuid := cookie.Value
 
 	// delete cookie
+	cookie.Expires = time.Unix(0, 0)
 	cookie.MaxAge = -1
+	cookie.Path = "/"
+	cookie.Domain = "localhost"
 
 	// delete session
 	err = DeleteSessionByUuid(uuid)
