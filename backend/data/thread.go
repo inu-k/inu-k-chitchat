@@ -2,7 +2,6 @@ package data
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"path"
 	"time"
@@ -105,14 +104,8 @@ func CreateThread(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 	cookie, err := r.Cookie("_cookie")
-	fmt.Println(cookie)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		// return
-		if err == http.ErrNoCookie {
-			fmt.Println("No cookie in CreateThread")
-			return
-		}
 		return
 	}
 	sessionUuid := cookie.Value

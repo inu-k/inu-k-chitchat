@@ -115,11 +115,6 @@ func GetMyInfo(w http.ResponseWriter, r *http.Request) (err error) {
 	cookie, err := r.Cookie("_cookie")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		// return
-		if err == http.ErrNoCookie {
-			fmt.Println("No cookie")
-			return
-		}
 		return
 	}
 	uuid := cookie.Value
@@ -187,8 +182,6 @@ func Authenticate(w http.ResponseWriter, r *http.Request) (err error) {
 			// HttpOnly: true,
 		}
 		http.SetCookie(w, &cookie)
-		fmt.Println(cookie)
-		fmt.Println("Set cookie")
 		w.WriteHeader(http.StatusOK)
 		return err
 	}
@@ -203,8 +196,6 @@ func DeleteSessionByUuid(uuid string) (err error) {
 // delete session
 // DELETE /sessions/me
 func DeleteSessionMe(w http.ResponseWriter, r *http.Request) (err error) {
-	fmt.Println("Delete session")
-
 	// get session uuid from cookie
 	cookie, err := r.Cookie("_cookie")
 	if err == http.ErrNoCookie {
@@ -235,7 +226,6 @@ func DeleteSessionMe(w http.ResponseWriter, r *http.Request) (err error) {
 }
 
 func HandleUsersMe(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("HandleUsersMe")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	switch r.Method {
@@ -262,7 +252,6 @@ func HandleSessions(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleSessionsMe(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("HandleSessionsMe")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")

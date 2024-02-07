@@ -2,7 +2,6 @@ package data
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -100,14 +99,8 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 	cookie, err := r.Cookie("_cookie")
-	fmt.Println(cookie)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		// return
-		if err == http.ErrNoCookie {
-			fmt.Println("No cookie in CreatePost")
-			return
-		}
 		return
 	}
 	sessionUuid := cookie.Value
@@ -126,9 +119,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &newPostInfo)
 	bodyText := newPostInfo.Body
 	userId := session.UserId
-	// fmt.Println(newPostInfo.ThreadUuid)
 	threadId, err := RetrieveThreadIdFromUuid(newPostInfo.ThreadUuid)
-	// fmt.Println(threadId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -154,7 +145,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	// fmt.Println(post)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
