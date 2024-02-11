@@ -14,7 +14,7 @@ var Db *sql.DB
 func init() {
 	var err error
 	err = godotenv.Load()
-	var dbUser, dbPassword string
+	var dbUser, dbPassword, DbHost, DbName, DbPort string
 	if err != nil {
 		fmt.Println("Error loading .env file")
 		dbUser = "postgres"
@@ -22,8 +22,12 @@ func init() {
 	} else {
 		dbUser = os.Getenv("DB_USER")
 		dbPassword = os.Getenv("DB_PASSWORD")
+		DbHost = os.Getenv("DB_HOST")
+		DbName = os.Getenv("DB_NAME")
+		DbPort = os.Getenv("DB_PORT")
 	}
-	Db, err = sql.Open("postgres", fmt.Sprintf("user=%s password=%s dbname=chitchat sslmode=disable", dbUser, dbPassword))
+	fmt.Println(dbUser, dbPassword, DbHost, DbName, DbPort)
+	Db, err = sql.Open("postgres", fmt.Sprintf("sslmode=disable, user=%s password=%s host=%s dbname=%s port=%s", dbUser, dbPassword, DbHost, DbName, DbPort))
 	if err != nil {
 		panic(err)
 	}

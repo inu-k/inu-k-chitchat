@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"inu-k-chitchat/data"
 	"net/http"
 
@@ -57,8 +58,9 @@ func main() {
 	mux.HandleFunc("/sessions", data.HandleSessions)
 
 	server := http.Server{
-		Addr:    "127.0.0.1:8999",
+		Addr:    "0.0.0.0:8999",
 		Handler: handler,
 	}
+	fmt.Println("Server start")
 	server.ListenAndServe()
 }
