@@ -54,8 +54,6 @@ func RetrieveThreadInfoFromUuid(threadUuid string) (ThreadInfo, error) {
 // get all threads in the database with a number of posts and returns it
 // GET /threads
 func GetThreads(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-
 	threads, err := RetrieveAllThreads()
 
 	if err != nil {
@@ -98,19 +96,35 @@ func GetThread(w http.ResponseWriter, r *http.Request) {
 // create a new thread
 // POST /threads
 func CreateThread(w http.ResponseWriter, r *http.Request) {
+	// get session uuid from cookie
+	cookie, err := r.Cookie("_cookie")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	sessionUuid := cookie.Value
+
+	// get session information
+	session, err := RetrieveSessionFromUuid(sessionUuid)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	len := r.ContentLength
 	body := make([]byte, len)
 	r.Body.Read(body)
 	var topicInfo TopicInfo
 	json.Unmarshal(body, &topicInfo)
 	topic := topicInfo.Topic
+	userId := session.UserId
 	u4, err := uuid.NewV4()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	uuid := u4.String()
-	_, err = Db.Query("INSERT INTO threads (uuid, topic, user_id, created_at) VALUES ($1, $2, $3, $4)", uuid, topic, 1, time.Now())
+	_, err = Db.Query("INSERT INTO threads (uuid, topic, user_id, created_at) VALUES ($1, $2, $3, $4)", uuid, topic, userId, time.Now())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

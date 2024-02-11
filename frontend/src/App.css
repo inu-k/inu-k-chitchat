@@ -39,16 +39,41 @@
 }
 
 .NavBar {
+  display: flex;
+  justify-content: space-between;
   background-color: white;
   width: 100%;
   border-bottom: #CCCCCC 3px solid;
+  background-color: #f8f8f8;
 }
 
 .NavBar-bland {
   padding: 0px 15px;
-  width: fit-content;
-  text-align: left;
   font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+}
+
+.login-button {
+  padding: 0px 15px;
+  text-decoration: none;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+}
+
+.logout-button {
+  padding: 0px 15px;
+  text-decoration: none;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+}
+
+.user-info-and-logout-button {
+  display: flex;
+  align-items: center;
+}
+
+.NavBar-user-info {
+  padding: 15px;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -94,4 +119,18 @@ textarea {
   margin: 10px;
   width: 70%;
   height: 50px;
+}
+
+.signup-button {
+  margin: 10px;
+}
+
+.login-form {
+  margin: 10px;
+}
+
+input {
+  height: 20px;
+  width: 30%;
+  margin: 10px;
 }

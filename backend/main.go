@@ -15,6 +15,7 @@ type Response struct {
 
 func index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 	jsonData := Response{
 		Name:    "TestName",
@@ -39,12 +40,21 @@ func index(w http.ResponseWriter, r *http.Request) {
 func main() {
 	mux := http.NewServeMux()
 
-	c := cors.Default()
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "DELETE", "OPTIONS"},
+		AllowCredentials: true,
+		AllowedHeaders:   []string{"Content-Type"},
+	})
 	handler := c.Handler(mux)
 	mux.HandleFunc("/index", index)
 	mux.HandleFunc("/threads/", data.GetThread)
 	mux.HandleFunc("/threads", data.HandleThreads)
 	mux.HandleFunc("/posts", data.HandlePosts)
+	mux.HandleFunc("/users/me", data.HandleUsersMe)
+	mux.HandleFunc("/users", data.HandleUsers)
+	mux.HandleFunc("/sessions/me", data.HandleSessionsMe)
+	mux.HandleFunc("/sessions", data.HandleSessions)
 
 	server := http.Server{
 		Addr:    "127.0.0.1:8999",

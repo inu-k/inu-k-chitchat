@@ -16,6 +16,7 @@ func init() {
 	err = godotenv.Load()
 	var dbUser, dbPassword string
 	if err != nil {
+		fmt.Println("Error loading .env file")
 		dbUser = "postgres"
 		dbPassword = "postgres"
 	} else {

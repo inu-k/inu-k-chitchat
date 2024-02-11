@@ -18,8 +18,8 @@ type Post struct {
 }
 
 type NewPostInfo struct {
-	Body       string `json:"body"`
-	UserId     int    `json:"userId"`
+	Body string `json:"body"`
+	// UserUuid   int    `json:"userUuid"`
 	ThreadUuid string `json:"threadUuid"`
 }
 
@@ -93,16 +93,29 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 // create a new post
 // POST /posts
 func CreatePost(w http.ResponseWriter, r *http.Request) {
+	// get session uuid from cookie
+	cookie, err := r.Cookie("_cookie")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	sessionUuid := cookie.Value
+
+	// get session information
+	session, err := RetrieveSessionFromUuid(sessionUuid)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	len := r.ContentLength
 	body := make([]byte, len)
 	r.Body.Read(body)
 	var newPostInfo NewPostInfo
 	json.Unmarshal(body, &newPostInfo)
 	bodyText := newPostInfo.Body
-	userId := newPostInfo.UserId
-	// fmt.Println(newPostInfo.ThreadUuid)
+	userId := session.UserId
 	threadId, err := RetrieveThreadIdFromUuid(newPostInfo.ThreadUuid)
-	// fmt.Println(threadId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -128,7 +141,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	// fmt.Println(post)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
