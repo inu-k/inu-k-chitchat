@@ -22,11 +22,11 @@ export default function LoginForm({ setIsLoggedIn }) {
                 setIsLoggedIn(true);
                 navigate('/');
             } else {
-                throw new Error('Network response was not ok');
+                navigate('/login');
             }
         } catch (error) {
             console.error('Error fetching data: ', error);
-            throw error;
+            // throw error;
         }
     }
     return (

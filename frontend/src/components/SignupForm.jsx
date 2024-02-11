@@ -21,7 +21,7 @@ export default function LoginForm() {
             }
         } catch (error) {
             console.error('Error fetching data: ', error);
-            throw error;
+            // throw error;
         }
     }
 
