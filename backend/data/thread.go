@@ -54,8 +54,6 @@ func RetrieveThreadInfoFromUuid(threadUuid string) (ThreadInfo, error) {
 // get all threads in the database with a number of posts and returns it
 // GET /threads
 func GetThreads(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-
 	threads, err := RetrieveAllThreads()
 
 	if err != nil {
@@ -99,10 +97,6 @@ func GetThread(w http.ResponseWriter, r *http.Request) {
 // POST /threads
 func CreateThread(w http.ResponseWriter, r *http.Request) {
 	// get session uuid from cookie
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
 	cookie, err := r.Cookie("_cookie")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

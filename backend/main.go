@@ -41,9 +41,10 @@ func main() {
 	mux := http.NewServeMux()
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},            // 許可するオリジン
-		AllowedMethods:   []string{"GET", "POST", "DELETE", "OPTIONS"}, // 許可するHTTPメソッド
-		AllowCredentials: true,                                         // クレデンシャルを許可
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "DELETE", "OPTIONS"},
+		AllowCredentials: true,
+		AllowedHeaders:   []string{"Content-Type"},
 	})
 	handler := c.Handler(mux)
 	mux.HandleFunc("/index", index)

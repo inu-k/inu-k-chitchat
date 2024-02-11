@@ -109,8 +109,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) (err error) {
 // NOTE: Does this function suit for RESTful API?
 func GetMyInfo(w http.ResponseWriter, r *http.Request) (err error) {
 	// get session uuid from cookie
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 	cookie, err := r.Cookie("_cookie")
 	if err != nil {
@@ -153,21 +151,19 @@ func GetMyInfo(w http.ResponseWriter, r *http.Request) (err error) {
 // check email and password
 // /POST /sessions
 func Authenticate(w http.ResponseWriter, r *http.Request) (err error) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	// get user info form
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 
 	user, err := RetrieveUserFromEmail(email)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusForbidden)
-		return
+		http.Error(w, "cannot login", http.StatusForbidden)
+		return err
 	}
 
 	if user.Password != CalcHash(password) {
-		http.Error(w, err.Error(), http.StatusForbidden)
-		return
+		http.Error(w, "cannot login", http.StatusForbidden)
+		return err
 	} else {
 		// generate uuid for new session
 		session, err := CreateSession(user)
@@ -226,8 +222,6 @@ func DeleteSessionMe(w http.ResponseWriter, r *http.Request) (err error) {
 }
 
 func HandleUsersMe(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	switch r.Method {
 	case "GET":
 		GetMyInfo(w, r)
@@ -235,7 +229,6 @@ func HandleUsersMe(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleUsers(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 	switch r.Method {
 	case "POST":
 		CreateUser(w, r)
@@ -243,8 +236,6 @@ func HandleUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleSessions(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	switch r.Method {
 	case "POST":
 		Authenticate(w, r)
@@ -252,10 +243,6 @@ func HandleSessions(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleSessionsMe(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	switch r.Method {
 	case "OPTIONS":
 		w.WriteHeader(http.StatusNoContent)

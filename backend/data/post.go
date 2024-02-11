@@ -94,10 +94,6 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 // POST /posts
 func CreatePost(w http.ResponseWriter, r *http.Request) {
 	// get session uuid from cookie
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
 	cookie, err := r.Cookie("_cookie")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -159,7 +155,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 
 // handle function for /posts
 func HandlePosts(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
 	switch r.Method {
 	case "GET":
 		GetPosts(w, r)
