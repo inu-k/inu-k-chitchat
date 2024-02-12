@@ -38,7 +38,7 @@ create table posts (
   created_at timestamp not null  
 );
 
-INSERT INTO users (id, uuid, name, email, password, created_at) VALUES (1, '1c0fbae0-fa0f-4220-50ee-679ec3fd25cd', 'test', 'a@a', '7e240de74fb1ed08fa08d38063f6a6a91462a815', '2023-09-18 01:16:53.918359');
-INSERT INTO threads (id, uuid, topic, user_id, created_at) VALUES (1, 'bff2553a-5448-4ef9-5ea8-e29580f4df10', 'test topic', 1, '2023-09-18 01:18:17.272956');
-INSERT INTO posts (id, uuid, body, user_id, thread_id, created_at) VALUES (1, '660e86d6-89d1-4cc5-5bc8-a77f8b4cd6ac' , 'first post!', 1, 1 , '2023-09-18 01:18:30.870423');
-INSERT INTO posts (id, uuid, body, user_id, thread_id, created_at) VALUES (2, '0f1a6f03-acc0-4a9c-4ea3-8affbeda4ad5' , 'second post', 1, 1 , '2023-09-26 12:17:44.395666');
+INSERT INTO users (uuid, name, email, password, created_at) VALUES ('1c0fbae0-fa0f-4220-50ee-679ec3fd25cd', 'test', 'a@a', '7e240de74fb1ed08fa08d38063f6a6a91462a815', '2023-09-18 01:16:53.918359');
+INSERT INTO threads (uuid, topic, user_id, created_at) VALUES ('bff2553a-5448-4ef9-5ea8-e29580f4df10', 'test topic', 1, '2023-09-18 01:18:17.272956');
+INSERT INTO posts (uuid, body, user_id, thread_id, created_at) VALUES ('660e86d6-89d1-4cc5-5bc8-a77f8b4cd6ac' , 'first post!', 1, 1 , '2023-09-18 01:18:30.870423');
+INSERT INTO posts (uuid, body, user_id, thread_id, created_at) VALUES ('0f1a6f03-acc0-4a9c-4ea3-8affbeda4ad5' , 'second post', 1, 1 , '2023-09-26 12:17:44.395666');

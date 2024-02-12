@@ -25,5 +25,17 @@ services:
       - db-store:/var/lib/postgresql/data
       - ./backend/data/setup.sql:/setup.sql
       - ./backend/data/setup.sh:/docker-entrypoint-initdb.d/setup.sh
+  
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+    command: npm start -- --host 0.0.0.0
+    stdin_open: true
+    
 volumes:
   db-store:

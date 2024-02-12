@@ -27,7 +27,7 @@ func init() {
 		DbPort = os.Getenv("DB_PORT")
 	}
 	fmt.Println(dbUser, dbPassword, DbHost, DbName, DbPort)
-	Db, err = sql.Open("postgres", fmt.Sprintf("sslmode=disable, user=%s password=%s host=%s dbname=%s port=%s", dbUser, dbPassword, DbHost, DbName, DbPort))
+	Db, err = sql.Open("postgres", fmt.Sprintf("sslmode=disable user=%s password=%s host=%s dbname=%s port=%s", dbUser, dbPassword, DbHost, DbName, DbPort))
 	if err != nil {
 		panic(err)
 	}
